@@ -1,0 +1,122 @@
+package Main;
+import java.io.*;
+
+// Continuation of the last assignment with modifications
+
+public class PhoneDirectory
+{
+
+    String new_file = null;
+
+    /* 
+    * Initialization of the phone directory when given a file location
+    * Parameters : location 
+    */
+
+    public PhoneDirectory(String location) throws FileNotFoundException
+    {
+        new_file = location;
+    }
+
+    
+    /*
+    * Takes file location to write / add to a given name and 
+    * phone number while following the predetermined format 
+    * Parameters : name, number
+    */
+
+    public void addEntry(String name, String number) throws IOException
+    {
+        Writer write_to_file = new FileWriter(new_file, true);  
+        write_to_file.write(name + ", " + number);
+        write_to_file.write(System.lineSeparator());
+        write_to_file.close(); //close file to prevent corruption
+    }
+
+
+    /*
+    * Create a temporary file that will serve as the updated version 
+    * of the phone directory. Read through the entirety of the current
+    * phone directory file and for all lines that do not contain the name 
+    * are written to the temporary file else otherwise deleted  
+    * Parameters : name
+    */
+
+    public void deleteEntry(String name) throws IOException
+    {
+        String current_line;
+        try
+        {
+            // Need a reader to go through and read the contents in current phone directory 
+            BufferedReader file_read = new BufferedReader(new FileReader(new_file));
+            // Temp file that will be used to write the contents of updated file (needs to be wrapped)
+            File temp = new File("/Users/Heynowz/Documents/LargeScaleProgramming/PhoneDirectoryJar/src/Resources/temp.text");
+            BufferedWriter file_write = new BufferedWriter(new FileWriter(temp));
+             
+            while ((current_line = file_read.readLine()) != null) 
+            {
+                // change name to lowercase for better accuracy during comparison
+                if (!current_line.toLowerCase().contains(name.toLowerCase())) 
+                {       
+                    file_write.write(current_line); 
+                }
+                file_read.close();
+                file_write.close();
+                file_write = new BufferedWriter(new FileWriter(new_file)); 
+                file_write.write(current_line);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("");
+        }
+    }
+
+
+
+    /*
+    * Read through the phone directory file until the name
+    * requested is found and then return the number 
+    * associated with it 
+    * Parameters : name
+    */
+
+    public String getNumber(String name) throws IOException
+    {
+        try
+        {
+            BufferedReader file_read = new BufferedReader(new FileReader((new_file)));
+            String current_line;
+            while ((current_line = file_read.readLine()) != null)
+            {
+                if (current_line.toLowerCase().contains(name.toLowerCase()))
+                {
+                    String[] splitString = current_line.split(", ");
+                    file_read.close();
+                    return splitString[-1];
+                }
+            }
+            file_read.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error occured");
+        }
+        return "Name not found";
+    }
+
+
+    /*
+    * Find the entered name and replace its 
+    *data field entries with the new field 
+    * Parameters : name, number
+    */
+
+    public void changeEntry(String name, String number) throws IOException
+    {
+        // A combination of the delete and add functions make up what this function does
+        deleteEntry(name);
+        addEntry(name, number);
+    }
+}
+
